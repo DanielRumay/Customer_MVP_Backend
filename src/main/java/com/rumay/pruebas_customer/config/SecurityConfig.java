@@ -29,9 +29,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // Deshabilitar CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // AGREGADO: Habilitar CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/websocket/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/mensajes/**", "/websocket/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/api/mensajes/**").authenticated() // ✅ agregar esto
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
