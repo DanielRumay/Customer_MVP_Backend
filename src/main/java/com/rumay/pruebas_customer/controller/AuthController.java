@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")  // AGREGADO: Permitir CORS en el controlador
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
@@ -24,12 +24,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registrar(@RequestBody RegisterRequest request) {
         try {
-            // AGREGADO: Log para depurar
-            System.out.println("📝 Intento de registro:");
-            System.out.println("   Username: " + request.getUsername());
-            System.out.println("   Nombre: " + request.getNombre());
-            System.out.println("   Email: " + request.getEmail());
-
             Usuario usuario = usuarioService.registrarUsuario(
                     request.getUsername(),
                     request.getPassword(),
@@ -39,46 +33,29 @@ public class AuthController {
 
             String token = jwtService.generarToken(usuario.getUsername(), usuario.getNombre());
 
-            System.out.println("✅ Usuario registrado exitosamente: " + usuario.getUsername());
-
             return ResponseEntity.ok(new AuthResponse(token, usuario.getNombre(), usuario.getUsername()));
         } catch (RuntimeException e) {
-            System.err.println("❌ Error en registro: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            // AGREGADO: Log para depurar
-            System.out.println("🔐 Intento de login:");
-            System.out.println("   Username: " + request.getUsername());
+        Optional<Usuario> usuarioOpt = usuarioService.buscarPorUsername(request.getUsername());
 
-            Optional<Usuario> usuarioOpt = usuarioService.buscarPorUsername(request.getUsername());
-
-            if (usuarioOpt.isEmpty()) {
-                System.err.println("❌ Usuario no encontrado: " + request.getUsername());
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña incorrectos");
-            }
-
-            Usuario usuario = usuarioOpt.get();
-
-            if (!usuarioService.validarPassword(request.getPassword(), usuario.getPassword())) {
-                System.err.println("❌ Contraseña incorrecta para: " + request.getUsername());
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña incorrectos");
-            }
-
-            String token = jwtService.generarToken(usuario.getUsername(), usuario.getNombre());
-
-            System.out.println("✅ Login exitoso: " + usuario.getUsername());
-
-            return ResponseEntity.ok(new AuthResponse(token, usuario.getNombre(), usuario.getUsername()));
-        } catch (Exception e) {
-            System.err.println("❌ Error en login: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña incorrectos");
         }
+
+        Usuario usuario = usuarioOpt.get();
+
+        if (!usuarioService.validarPassword(request.getPassword(), usuario.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña incorrectos");
+        }
+
+        String token = jwtService.generarToken(usuario.getUsername(), usuario.getNombre());
+
+        return ResponseEntity.ok(new AuthResponse(token, usuario.getNombre(), usuario.getUsername()));
     }
 
     @GetMapping("/validate")
@@ -90,9 +67,9 @@ public class AuthController {
 
             if (jwtService.validarToken(token, username)) {
                 return ResponseEntity.ok(new AuthResponse(token, nombre, username));
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
             }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
         }
