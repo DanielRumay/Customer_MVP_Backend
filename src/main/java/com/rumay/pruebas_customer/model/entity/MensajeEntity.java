@@ -1,4 +1,4 @@
-package com.rumay.pruebas_customer.model;
+package com.rumay.pruebas_customer.model.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

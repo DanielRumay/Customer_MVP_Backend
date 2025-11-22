@@ -1,14 +1,12 @@
 package com.rumay.pruebas_customer.repository;
 
-import com.rumay.pruebas_customer.model.Usuario;
+import com.rumay.pruebas_customer.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByUsername(String username);
+public interface UserRepository extends JpaRepository<User, Integer> {
+    User findByUsername(String username);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 }

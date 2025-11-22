@@ -1,4 +1,4 @@
-package com.rumay.pruebas_customer.model.dto;
+package com.rumay.pruebas_customer.dto;
 
 public class ReaccionResponseDTO {
 

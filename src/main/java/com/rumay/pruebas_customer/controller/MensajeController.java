@@ -1,7 +1,7 @@
 package com.rumay.pruebas_customer.controller;
 
 import com.rumay.pruebas_customer.model.Mensaje;
-import com.rumay.pruebas_customer.model.MensajeEntity;
+import com.rumay.pruebas_customer.model.entity.MensajeEntity;
 import com.rumay.pruebas_customer.repository.MensajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
